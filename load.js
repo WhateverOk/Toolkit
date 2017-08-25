@@ -19,7 +19,7 @@ function load_data() {
      data_JSON = JSON.parse(response);
      
      
-     console.log(data_JSON);
+    //  console.log(data_JSON);
  });
 }
 

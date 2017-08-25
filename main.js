@@ -200,7 +200,7 @@ function Draw() { // A normal function which inclues complete draw method
 //        console.log(OutputObjects[i]) ;
         if(OutputObjects[i].on) {
             ctx.fillStyle = "#ff1a1a" ;  
-            console.log("Sucuess on output value") ;
+            // console.log("Sucuess on output value") ;
         }
         else {
             ctx.fillStyle = "#ffcccc" ;
@@ -348,25 +348,60 @@ function OnMouseDragEnd(mouseData) {
 
 var update_func = setInterval(Update , 1000/30) ;
 function Update() {
+//     for(var i = 0 ; i < CircuitObjects.length ; i++) {
+//         for(var j = 0 ; j < CircuitObjects[i].Connection.length ; j++) {
+//             for(var k = 0 ; k < CircuitObjects[i].data.table.length ; k++) { // loop through all inputs
+
+//                 if(CircuitObjects[i].Connection[j].in) {
+//                     if(CircuitObjects[i].data.table[k].input[0] ==  CircuitObjects[i].Connection[j].in.on) {
+
+//                         if(CircuitObjects[i].Connection[j+1].out) {
+//                             var OutputObjectRef = CircuitObjects[i].Connection[j+1].out ; 
+//                             OutputObjectRef.on = CircuitObjects[i].data.table[k].output[0] ;
+//                             console.log(OutputObjects) ;
+// //                            console.log("Sucuess on output value") ;
+//                         }
+//                     }
+//                     else {
+// //                        if(CircuitObjects[i].Connection[j+1].out)
+// //                            CircuitObjects[i].Connection[j+1].out.on = false ;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
     for(var i = 0 ; i < CircuitObjects.length ; i++) {
-        for(var j = 0 ; j < CircuitObjects[i].Connection.length ; j++) {
-            for(var k = 0 ; k < CircuitObjects[i].data.table.length ; k++) { // loop through all inputs
 
-                if(CircuitObjects[i].Connection[j].in) {
-                    if(CircuitObjects[i].data.table[k].input[0] ==  CircuitObjects[i].Connection[j].in.on) {
+        var circuit = CircuitObjects[i] ;
+        var data = circuit.data ;
+        if(data) {
+            var inputLength = data.table[0].input.length ;
 
-                        if(CircuitObjects[i].Connection[j+1].out) {
-                            var OutputObjectRef = CircuitObjects[i].Connection[j+1].out ; 
-                            OutputObjectRef.on = CircuitObjects[i].data.table[k].output[0] ;
-                            console.log(OutputObjects) ;
-//                            console.log("Sucuess on output value") ;
-                        }
-                    }
-                    else {
-//                        if(CircuitObjects[i].Connection[j+1].out)
-//                            CircuitObjects[i].Connection[j+1].out.on = false ;
+            for(var j = 0 ; j < circuit.Connection.length ; j += inputLength+1 ) {
+                var input = [] ;
+                var table = data.table ;
+                var op = false ;
+
+                for(var k = 0 ; k < inputLength ; k++) {
+                    if(circuit.Connection[j+k].in) {
+                        var ip = circuit.Connection[j+k].in.on ;
+                        input.push(ip) ;
                     }
                 }
+                
+                if(input.length > 0) {
+                    op = GetOutput(i , input) ;
+                    // console.log(op) ;
+                    if(circuit.Connection[j+inputLength].out)
+                        circuit.Connection[j+inputLength].out.on = op ;
+
+                    // console.log(circuit.Connection[j+inputLength]) ;
+                }
+
+                // console.log(input) ;
+                // console.log(op) ;
+                // if(data.iport[j] )
             }
         }
     }
@@ -375,34 +410,49 @@ function Update() {
 }
 function SelectTable(table , input , inputIndex) {
     var selection = [] ;
-    if(inputIndex > input.length) 
-        return selection ;
+    // console.log(table) ;
+    // if(inputIndex > input.length) {
+    //     console.log(table);
+    //     return table ;
+    // }
     // for(var j = 0 ; j < input.length ; j++) {
         for(var i = 0 ; i < table.length ; i++) {
             // for(var j = 0 ; j <    
             if(table[i].input[inputIndex] == input[inputIndex] )
                 selection.push(table[i]) ;
         }
+        // return 1 ;
     // }
-   SelectTable(selection , input , inputIndex+1 ) ;
+    if(inputIndex == input.length) {
+        // console.log(table) ;
+        // console.log("Returning") ;
+        return table ;
+    }
+    else {
+        return SelectTable(selection , input , inputIndex+1 ) ;
+
+    }
 }
 function GetOutput(circuitIndex , input) { //input is a array
     var inputLength , table ; // , selection = [] ;
 
     // rank = -1 ;
     // tableLength = CircuitObjects[circuitIndex].data.table.length ;
-    inputLength = CircuitObjects[circuitIndex].data.table.input[0].length ;
+    inputLength = CircuitObjects[circuitIndex].data.table[0].input.length ;
     table = CircuitObjects[circuitIndex].data.table ;
 
-    if(inputLength != input.length) 
-        return null ;
+    if(inputLength != input.length)
+        return 0 ;
 
-    table = SelectTable(table , input , 0) ;
-
-    if(table.length > 1)
-        return null ;
+    var table = SelectTable(table , input , 0) ;
+    // console.log(table) ;
+    // console.log(input) ;
+    // console.log(SelectTable(table , input , 0)) ;
+    // console.log(table[0].output[0]);
+    if(table.length != 1)
+        return 0 ;
     else
-        return table[0] ;
+        return table[0].output[0] ;
     // for(var i = 0 ; i < tableLength ; i++ ) {
     //     for(var j = 0 ; j < inputLength ; j++) {
     //         if(table[i].input[j] == input[j]) 
