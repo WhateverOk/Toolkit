@@ -350,7 +350,8 @@ var update_func = setInterval(Update , 1000/30) ;
 function Update() {
     for(var i = 0 ; i < CircuitObjects.length ; i++) {
         for(var j = 0 ; j < CircuitObjects[i].Connection.length ; j++) {
-            for(var k = 0 ; k < CircuitObjects[i].data.table.length ; k++) {
+            for(var k = 0 ; k < CircuitObjects[i].data.table.length ; k++) { // loop through all inputs
+
                 if(CircuitObjects[i].Connection[j].in) {
                     if(CircuitObjects[i].data.table[k].input[0] ==  CircuitObjects[i].Connection[j].in.on) {
 
@@ -372,7 +373,43 @@ function Update() {
     
     Draw() ;
 }
+function SelectTable(table , input , inputIndex) {
+    var selection = [] ;
+    if(inputIndex > input.length) 
+        return selection ;
+    // for(var j = 0 ; j < input.length ; j++) {
+        for(var i = 0 ; i < table.length ; i++) {
+            // for(var j = 0 ; j <    
+            if(table[i].input[inputIndex] == input[inputIndex] )
+                selection.push(table[i]) ;
+        }
+    // }
+   SelectTable(selection , input , inputIndex+1 ) ;
+}
+function GetOutput(circuitIndex , input) { //input is a array
+    var inputLength , table ; // , selection = [] ;
 
+    // rank = -1 ;
+    // tableLength = CircuitObjects[circuitIndex].data.table.length ;
+    inputLength = CircuitObjects[circuitIndex].data.table.input[0].length ;
+    table = CircuitObjects[circuitIndex].data.table ;
+
+    if(inputLength != input.length) 
+        return null ;
+
+    table = SelectTable(table , input , 0) ;
+
+    if(table.length > 1)
+        return null ;
+    else
+        return table[0] ;
+    // for(var i = 0 ; i < tableLength ; i++ ) {
+    //     for(var j = 0 ; j < inputLength ; j++) {
+    //         if(table[i].input[j] == input[j]) 
+    //             rank = j ;
+    //     }
+    // }
+}
 function ICDrag(event, ic) {
     var pos = new Vector(event.clientX -  9, event.clientY - 9) ;
     for(var i = 0 ; i < CircuitObjects.length ; i++) {
