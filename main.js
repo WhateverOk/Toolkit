@@ -148,8 +148,8 @@ window.onload = function() { // This functions whenever the page is loaded
 function Start() { 
     var buttonStartX = 40 ;
     
-    for(var i = 0 ; i < 5 ; i++) {  // Initiating our buttons
-        var tempButton = new Button(buttonStartX , 100 , 30 , 30) ;
+    for(var i = 0 ; i < 10 ; i++) {  // Initiating our buttons
+        var tempButton = new Button(buttonStartX , 500 , 30 , 30) ;
         ButtonObjects.push(tempButton) ;
         
         buttonStartX += 45 ;
@@ -163,7 +163,7 @@ function Start() {
         circuitStartX += 180 ;
     }
     
-    var outputStartX = 300 ;
+    var outputStartX = 60 ;
     for(var i= 0 ; i < 4 ; i++) {
         var tempOutput = new Circle(outputStartX , 115 , 12) ;
         OutputObjects.push(tempOutput) ;
@@ -177,7 +177,7 @@ function Draw() { // A normal function which inclues complete draw method
     
     ctx.clearRect(0, 0 , 800 , 600) ;
     
-    for(var i = 0 ; i< 5 ; i++) {
+    for(var i = 0 ; i< ButtonObjects.length ; i++) { // All Input buttons 
         ButtonObjects[i].Draw(ctx) ;
     }
     
@@ -196,7 +196,7 @@ function Draw() { // A normal function which inclues complete draw method
         }
     }
     
-    for(var i = 0 ; i < OutputObjects.length ; i++) {
+    for(var i = 0 ; i < OutputObjects.length ; i++) { // Output buttons
 //        console.log(OutputObjects[i]) ;
         if(OutputObjects[i].on) {
             ctx.fillStyle = "#ff1a1a" ;  
@@ -371,7 +371,7 @@ function Update() {
 //         }
 //     }
 
-    for(var i = 0 ; i < CircuitObjects.length ; i++) {
+    for(var i = 0 ; i < CircuitObjects.length ; i++) { // For all basic gates similar to Not and And 
 
         var circuit = CircuitObjects[i] ;
         var data = circuit.data ;
@@ -392,16 +392,10 @@ function Update() {
                 
                 if(input.length > 0) {
                     op = GetOutput(i , input) ;
-                    // console.log(op) ;
                     if(circuit.Connection[j+inputLength].out)
                         circuit.Connection[j+inputLength].out.on = op ;
-
                     // console.log(circuit.Connection[j+inputLength]) ;
                 }
-
-                // console.log(input) ;
-                // console.log(op) ;
-                // if(data.iport[j] )
             }
         }
     }
@@ -410,56 +404,34 @@ function Update() {
 }
 function SelectTable(table , input , inputIndex) {
     var selection = [] ;
-    // console.log(table) ;
-    // if(inputIndex > input.length) {
-    //     console.log(table);
-    //     return table ;
-    // }
-    // for(var j = 0 ; j < input.length ; j++) {
-        for(var i = 0 ; i < table.length ; i++) {
-            // for(var j = 0 ; j <    
-            if(table[i].input[inputIndex] == input[inputIndex] )
-                selection.push(table[i]) ;
-        }
-        // return 1 ;
-    // }
-    if(inputIndex == input.length) {
-        // console.log(table) ;
-        // console.log("Returning") ;
+  
+    for(var i = 0 ; i < table.length ; i++) { 
+        if(table[i].input[inputIndex] == input[inputIndex] )
+            selection.push(table[i]) ;
+    }
+        
+    if(inputIndex == input.length)
         return table ;
-    }
-    else {
+    else
         return SelectTable(selection , input , inputIndex+1 ) ;
-
-    }
 }
 function GetOutput(circuitIndex , input) { //input is a array
-    var inputLength , table ; // , selection = [] ;
+    var inputLength , table ;
 
-    // rank = -1 ;
-    // tableLength = CircuitObjects[circuitIndex].data.table.length ;
     inputLength = CircuitObjects[circuitIndex].data.table[0].input.length ;
     table = CircuitObjects[circuitIndex].data.table ;
 
     if(inputLength != input.length)
         return 0 ;
 
-    var table = SelectTable(table , input , 0) ;
-    // console.log(table) ;
-    // console.log(input) ;
-    // console.log(SelectTable(table , input , 0)) ;
-    // console.log(table[0].output[0]);
+    table = SelectTable(table , input , 0) ;
+
     if(table.length != 1)
         return 0 ;
     else
         return table[0].output[0] ;
-    // for(var i = 0 ; i < tableLength ; i++ ) {
-    //     for(var j = 0 ; j < inputLength ; j++) {
-    //         if(table[i].input[j] == input[j]) 
-    //             rank = j ;
-    //     }
-    // }
 }
+
 function ICDrag(event, ic) {
     var pos = new Vector(event.clientX -  9, event.clientY - 9) ;
     for(var i = 0 ; i < CircuitObjects.length ; i++) {
@@ -481,8 +453,6 @@ function ICDrag(event, ic) {
                 CircuitObjects[i].Connection.push(tempPoint) ;
                 y += 30 ;
             }
-            
-//            console.log("Name : "+name+" i : "+(i+1)) ;
         }
     }
     
@@ -524,3 +494,8 @@ function ORGATE(event) {
     ICDrag(event , "7432") ;
 }
 document.getElementById("OR").addEventListener("dragend" , ORGATE) ;
+
+function XORGATE(event) {
+    ICDrag(event , "7486") ;
+}
+document.getElementById("XOR").addEventListener("dragend" , XORGATE) ;
